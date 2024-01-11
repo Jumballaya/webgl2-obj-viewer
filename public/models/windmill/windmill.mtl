@@ -1,0 +1,26 @@
+# Material Count: 2
+
+newmtl windmill_blade
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd windmill_blade_albedo.jpg
+map_Bump windmill_blade_normal.jpg
+
+newmtl windmill_base
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.00000
+illum 1
+map_Kd windmill_base_albedo.jpg
+map_Bump windmill_base_normal.jpg
+map_Ns windmill_base_specular.jpg

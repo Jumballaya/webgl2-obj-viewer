@@ -1,0 +1,44 @@
+import { Mesh } from "../viewer/mesh/Mesh";
+import { WebGL } from "../gl/WebGL";
+import { ObjFile } from "./obj/ObjFile";
+import { Material } from '../viewer/material/Material';
+import { ModelMaterial } from "../viewer/material/ModelMaterial";
+
+
+export async function loadObj(base: string, file: string, webgl: WebGL, modelShader: string): Promise<Mesh> {
+  const objFile = await ObjFile.FromFile(file, base);
+  const contents = await objFile.parse();
+
+  for (const material of contents.materials) {
+    for (const texToLoad of material.getTexturesToLoad()) {
+      await webgl.loadTexture(texToLoad.name, texToLoad.path);
+    }
+  }
+
+  const mats: Record<string, Material> = {};
+  for (const material of contents.materials) {
+    const list = material.getMaterials();
+    for (const mat of list) {
+      mats[mat.name] = new ModelMaterial(webgl, modelShader, mat.config);
+    }
+  }
+
+
+  const defaultMaterial = new ModelMaterial(webgl, modelShader, { name: 'default' } as any);
+  
+  const meshes: Mesh[] = [];
+  let i = 0;
+  for (const obj of contents.meshes) {
+    const vertexArray = webgl.createVertexArray({
+      drawType: WebGL2RenderingContext.STATIC_DRAW,
+      buffers: obj.buffers,
+    });
+    meshes.push(new Mesh(vertexArray, obj.material ? mats[obj.material] : defaultMaterial));
+    i++;
+  }
+
+  if (meshes.length === 1) return meshes[0];
+  const root = meshes[0];
+  root.children.push(...meshes.slice(1));
+  return root;
+}
