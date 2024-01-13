@@ -2,9 +2,9 @@ import { WebGL } from '../gl/WebGL';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { Controller } from '../controls/Controller';
 import { UBO } from '../gl/UBO';
-import { FPSController } from '../controls/FPSController';
 import { CameraController } from '../controls/types/camera-controller';
 import { ArcballCamera } from '../controls/Arcball';
+import { Shader } from '../gl/Shader';
 
 export class Camera {
   private webgl: WebGL;
@@ -25,7 +25,6 @@ export class Camera {
     this.controller = new Controller();
     this.input.registerController(this.controller);
     this.webgl.registerController(this.controller);
-    //this.controller.requestPointerLock();
   
     this.cameraUBO = webgl.createUBO('Camera', [
       { name: 'projection', type: 'mat4', },
@@ -36,11 +35,16 @@ export class Camera {
     this.cameraUBO.set('projection', this.projMatrix);
     this.cameraUBO.set('view', this.input.viewMatrix);
     this.cameraUBO.set('position', [...this.input.eyePos(), 0.0] as vec4);
-    this.cameraUBO.setupShader(webgl.shaders.basic);
-    this.cameraUBO.setupShader(webgl.shaders.screen);
-    this.cameraUBO.setupShader(webgl.shaders.grid);
     this.cameraUBO.unbind();
   
+  }
+
+  public setupUBO(shaders: Shader[]) {
+    this.cameraUBO.bind();
+    for (const shader of shaders) {
+      this.cameraUBO.setupShader(shader);
+    }
+    this.cameraUBO.unbind();
   }
 
   public update() {

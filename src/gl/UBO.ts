@@ -12,13 +12,19 @@ export class UBO {
 
   public name: string;
 
-  constructor(ctx: WebGL2RenderingContext, name: string, config: UBOConfig) {
+  constructor(ctx: WebGL2RenderingContext, name: string, config: UBOConfig | Float32Array) {
     this.ctx = ctx;
     this.name = name;
     const buffer = ctx.createBuffer();
     if (!buffer) throw new Error('could not create uniform buffer object');
     this.buffer = buffer;
     this.ctx.bindBufferBase(this.ctx.UNIFORM_BUFFER, this.bindingPoint, this.buffer);
+
+    if (config instanceof Float32Array) {
+      this.ctx.bufferData(ctx.UNIFORM_BUFFER, config, ctx.DYNAMIC_DRAW);
+      this.unbind();
+      return;
+    }
 
     let size = 0;
     for (const entry of config) {
@@ -40,6 +46,10 @@ export class UBO {
     
     const offset = info.offset;
     this.ctx.bufferSubData(this.ctx.UNIFORM_BUFFER, offset * 4, new Float32Array(value));
+  }
+
+  public update(data: Float32Array, offset = 0) {
+    this.ctx.bufferSubData(this.ctx.UNIFORM_BUFFER, offset, data);
   }
 
   public bind() {

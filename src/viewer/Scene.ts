@@ -5,6 +5,7 @@ import { Mesh } from './mesh/Mesh';
 import { UBO } from '../gl/UBO';
 import { Surface } from '../gl/Surface';
 import { GridMesh } from './mesh/GridMesh';
+import { LightManager } from './light/LightManager';
 
 
 export class Scene {
@@ -17,6 +18,7 @@ export class Scene {
   private screen: Surface;
   private _darkMode = false;
   private gridFloor: GridMesh;
+  private lightManager: LightManager;
 
   constructor(webgl: WebGL, camera: Camera) {
     this.camera = camera;
@@ -33,7 +35,8 @@ export class Scene {
     ]);
     this.modelUBO.bind();
     this.modelUBO.set('matrix', mat4.create());
-    this.modelUBO.setupShader(webgl.shaders['basic']);
+    this.modelUBO.setupShader(webgl.shaders['lights']);
+    this.modelUBO.setupShader(webgl.shaders['phong']);
     this.modelUBO.setupShader(webgl.shaders['grid']);
     this.modelUBO.unbind();
     
@@ -45,8 +48,21 @@ export class Scene {
       { name: 'textures', type: 'vec4' },
     ]);
     this.materialUBO.bind();
-    this.materialUBO.setupShader(webgl.shaders['basic'])
+    this.modelUBO.setupShader(webgl.shaders['lights']);
+    this.materialUBO.setupShader(webgl.shaders['phong'])
     this.materialUBO.unbind();
+
+    this.camera.setupUBO([
+      this.webgl.shaders['lights'],
+      this.webgl.shaders['phong'],
+      this.webgl.shaders['screen'],
+      this.webgl.shaders['grid'],
+    ]);
+
+    this.lightManager = new LightManager(webgl);
+    this.lightManager.registerShaders([
+      this.webgl.shaders['lights'],
+    ]);
 
     this.screen = webgl.createSurface('screen', this.camera.screenSize, true);
     this.screen.disable();
@@ -73,9 +89,11 @@ export class Scene {
   public add(mesh: Mesh) {
     this.meshes.push(mesh);
     this.meshes.sort((a, b) => {
-      return (b.opacity - a.opacity);
+      return (b.material.opacity  - a.material.opacity);
     });
   }
+
+  public addLight() {}
 
   public render() {
     this.webgl.clear('color', 'depth');

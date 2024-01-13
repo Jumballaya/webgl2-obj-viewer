@@ -53,6 +53,7 @@ export class FPSController {
 
   public registerController(controller: Controller) {
     this.controller = controller;
+    this.controller.requestPointerLock();
 
     let phi = 0;
     let theta = 0;

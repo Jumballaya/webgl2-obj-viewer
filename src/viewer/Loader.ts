@@ -37,6 +37,7 @@ export class Loader {
     for (const item of items) {
       switch (item.type) {
         case 'obj:network': {
+          if (!item.dir.endsWith('/')) item.dir = item.dir + '/';
           await this.loadObjNetwork(item.dir, item.file, item.shader);
           break;
         }

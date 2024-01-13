@@ -51,7 +51,7 @@ export class MtlLineTokenizer {
             tokens.push({ type: 'albedo-map', value: 'map_Kd' });
             continue;
           }
-          if (slice.toLowerCase() === 'map_ns') {
+          if (slice.toLowerCase() === 'map_ns' || slice.toLowerCase() === 'map_ks') {
             i += 6;
             tokens.push({ type: 'specular-map', value: 'map_Ns' });
             continue;

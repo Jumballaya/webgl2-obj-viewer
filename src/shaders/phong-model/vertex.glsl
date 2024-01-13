@@ -25,5 +25,5 @@ void main() {
   v_uv = a_uv;
   v_normal = mat3(model.inv_trans_matrix) * a_normal;
   v_camera_position = camera.position.xyz;
-  v_position = a_position.xyz;
+  v_position = (model.matrix * a_position).xyz;
 }

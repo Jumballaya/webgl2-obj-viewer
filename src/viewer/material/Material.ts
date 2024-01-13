@@ -5,6 +5,8 @@ export class Material {
   protected webgl: WebGL;
   protected shader: string;
   protected textures: Array<string> = [];
+  public opacity: number = 1;
+
 
   public cullFace = true;
 

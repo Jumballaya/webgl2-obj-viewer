@@ -1,19 +1,20 @@
-import { mat4, vec3 } from "gl-matrix";
+import { vec3 } from "gl-matrix";
 import { VertexArray } from "../../gl/VertexArray";
 import { WebGL } from "../../gl/WebGL";
 import { Uniform } from "../../gl/types/uniforms.type";
 import { UBO } from "../../gl/UBO";
 import { Material } from "../material/Material";
-import { ModelMaterial } from "../material/ModelMaterial";
+import { PhongMaterial } from "../material/PhongMaterial";
 import { DrawMode } from "../../gl/types/configs";
+import { Transform } from "../../math/Transform";
 
 export class Mesh {
-  protected vertexArray: VertexArray;
-  protected material: Material;
-  protected modelMatrix: mat4 = mat4.create();
-  protected invTransMatrix: mat4 = mat4.create();
+  private transform: Transform = new Transform();
   private _drawMode: DrawMode = 'triangles';
-
+  
+  protected vertexArray: VertexArray;
+  
+  public material: Material;
   public children: Mesh[] = [];
 
   constructor(vao: VertexArray, material: Material) {
@@ -29,13 +30,13 @@ export class Mesh {
     }
     this.vertexArray.bind();
 
-    if (this.material instanceof ModelMaterial) {
+    if (this.material instanceof PhongMaterial) {
       this.material.bindUbo(materialUBO);
     }
     this.material.bind();
     modelUbo.bind();
-    modelUbo.set('matrix', this.modelMatrix);
-    modelUbo.set('inv_trans_matrix', this.modelMatrix);
+    modelUbo.set('matrix', this.transform.matrix);
+    modelUbo.set('inv_trans_matrix', this.transform.invTrans);
     
     if (this.material.cullFace) {
       webgl.enable('cull_face');
@@ -53,44 +54,6 @@ export class Mesh {
     this.material.uniform(name, uniform);
   }
 
-  public rotate(axis: vec3, rad: number) {
-    mat4.rotate(this.modelMatrix, this.modelMatrix, rad, axis);
-  }
-
-  public scale(amount: vec3) {
-    mat4.scale(this.modelMatrix, this.modelMatrix, amount);
-  }
-
-  public translate(amount: vec3) {
-    mat4.translate(this.modelMatrix, this.modelMatrix, amount);
-  }
-
-  public set diffuse(c: vec3) {
-    if (this.material instanceof ModelMaterial) {
-      this.material.diffuse = c;
-    }
-  }
-
-  public get diffuse(): vec3 {
-    if (this.material instanceof ModelMaterial) {
-      return this.material.diffuse;
-    }
-    return [0, 0, 0];
-  }
-
-  public set opacity(o: number) {
-    if (this.material instanceof ModelMaterial) {
-      this.material.opacity = Math.min(1, Math.max(0, o));
-    }
-  }
-
-  public get opacity(): number {
-    if (this.material instanceof ModelMaterial) {
-      return this.material.opacity;
-    }
-    return 1;
-  }
-
   public get drawMode(): DrawMode {
     return this._drawMode;
   }
@@ -99,6 +62,27 @@ export class Mesh {
     this._drawMode = m;
     for (const c of this.children) {
       c.drawMode = m;
+    }
+  }
+
+  public set translation(t: vec3) {
+    this.transform.translation = t;
+    for (const child of this.children) {
+      child.translation = t;
+    }
+  }
+
+  public set rotation(r: vec3) {
+    this.transform.rotation = r;
+    for (const child of this.children) {
+      child.rotation = r;
+    }
+  }
+
+  public set scale(s: vec3) {
+    this.transform.scale = s;
+    for (const child of this.children) {
+      child.scale = s;
     }
   }
 

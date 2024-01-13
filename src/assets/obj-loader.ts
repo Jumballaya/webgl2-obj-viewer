@@ -2,7 +2,7 @@ import { Mesh } from "../viewer/mesh/Mesh";
 import { WebGL } from "../gl/WebGL";
 import { ObjFile } from "./obj/ObjFile";
 import { Material } from '../viewer/material/Material';
-import { ModelMaterial } from "../viewer/material/ModelMaterial";
+import { PhongMaterial } from "../viewer/material/PhongMaterial";
 
 
 export async function loadObj(base: string, file: string, webgl: WebGL, modelShader: string): Promise<Mesh> {
@@ -19,12 +19,12 @@ export async function loadObj(base: string, file: string, webgl: WebGL, modelSha
   for (const material of contents.materials) {
     const list = material.getMaterials();
     for (const mat of list) {
-      mats[mat.name] = new ModelMaterial(webgl, modelShader, mat.config);
+      mats[mat.name] = new PhongMaterial(webgl, modelShader, mat.config);
     }
   }
 
 
-  const defaultMaterial = new ModelMaterial(webgl, modelShader, { name: 'default' } as any);
+  const defaultMaterial = new PhongMaterial(webgl, modelShader, { name: 'default' });
   
   const meshes: Mesh[] = [];
   let i = 0;

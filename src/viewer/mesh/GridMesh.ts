@@ -10,8 +10,8 @@ export class GridMesh extends QuadMesh {
   constructor(webgl: WebGL, size: vec2) {
     super(webgl, new Material(webgl, 'grid'));
     this.material.cullFace = false;
-    this.rotate([-1, 0, 0], Math.PI / 2);
-    this.scale([size[0], size[1], 1]);
+    this.rotation =[-Math.PI / 2, 0, 0];
+    this.scale = [size[0], size[1], 1];
     this.material.uniform('u_resolution', { type: 'vec2', value: size });
     this.material.uniform('u_dark_mode', { type: 'boolean', value: this._darkMode });
   }

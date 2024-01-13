@@ -166,7 +166,7 @@ export class WebGL {
     return this.createTexture(name, img);
   }
 
-  public createUBO(name: string, config: UBOConfig): UBO {
+  public createUBO(name: string, config: UBOConfig | Float32Array): UBO {
     return new UBO(this.context, name, config);
   }
 }
