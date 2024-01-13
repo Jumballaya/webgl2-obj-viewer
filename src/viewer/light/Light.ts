@@ -26,6 +26,7 @@ export class Light {
         this._position[0] = p[0];
         this._position[1] = p[1];
         this._position[2] = p[2];
+        this.manager.updateLight(this);
     }
 
 }

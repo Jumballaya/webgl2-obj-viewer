@@ -6,11 +6,15 @@ import { UBO } from '../gl/UBO';
 import { Surface } from '../gl/Surface';
 import { GridMesh } from './mesh/GridMesh';
 import { LightManager } from './light/LightManager';
+import { Light } from './light/Light';
+import { LightTypes } from './light/types/light-types.type';
+import { LitMaterial } from './material/LitMaterial';
 
 
 export class Scene {
   private webgl: WebGL;
   private meshes: Mesh[] = [];
+  private lights: Light[] = [];
   private camera: Camera;
   private modelUBO: UBO;
   private materialUBO: UBO;
@@ -48,7 +52,7 @@ export class Scene {
       { name: 'textures', type: 'vec4' },
     ]);
     this.materialUBO.bind();
-    this.modelUBO.setupShader(webgl.shaders['lights']);
+    this.materialUBO.setupShader(webgl.shaders['lights']);
     this.materialUBO.setupShader(webgl.shaders['phong'])
     this.materialUBO.unbind();
 
@@ -93,7 +97,11 @@ export class Scene {
     });
   }
 
-  public addLight() {}
+  public addLight<T extends keyof LightTypes>(type: T): LightTypes[T] {
+    const l = this.lightManager.createLight(type);
+    this.lights.push(l);
+    return l as LightTypes[T];
+  }
 
   public render() {
     this.webgl.clear('color', 'depth');

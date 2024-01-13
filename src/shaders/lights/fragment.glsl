@@ -24,6 +24,7 @@ struct Pointlight {
 layout(std140) uniform Material {
   uniform vec3 ambient;
   uniform vec3 diffuse;
+  uniform vec3 specular;
   uniform vec3 opacity; // r channel is opacity
   uniform vec4 textures; // 0 -> albedo 1 -> normal 2 -> specular
 } material;
@@ -39,7 +40,7 @@ float point_light(vec3 position) {
     float distance = length(offset);
 
     float diffuse = max(0.0, dot(direction, v_normal));
-    float attenuation = 1.0 / (distance * distance);
+    float attenuation = 2.0 / distance;
     return (diffuse * attenuation);
 }
 
@@ -69,8 +70,11 @@ void main() {
       brightness += point_light(pointlights[i].position.xyz) * pointlights[i].position.w;
   }
 
-  vec3 ambient_color = ambient * 0.1;
-  vec3 color = (ambient_color + albedo) * brightness;
+  brightness *= 3.0;
 
-  outColor = vec4(color, material.opacity.r);
+  vec3 ambient_color = ambient * 0.2;
+  vec3 diffuse_color = albedo * brightness;
+  vec3 color = ambient_color + diffuse_color;
+
+  outColor = vec4(color, 1.0);
 }

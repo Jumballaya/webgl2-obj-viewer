@@ -36,17 +36,23 @@ async function main() {
     { type: 'shader:src', name: 'grid', vertex: gridVert, fragment: gridFrag },
     { type: 'shader:src', name: 'phong', vertex: phongVert, fragment: phongFrag },
     { type: 'shader:src', name: 'lights', vertex: lightsVert, fragment: lightsFrag },
-    { type: 'obj:network', dir: 'models/windmill/', file: 'windmill.obj', shader: 'phong' },
+    { type: 'obj:network', dir: 'models/windmill', file: 'windmill.obj', shader: 'lights' },
   ]);
   
   const camera = new Camera(webgl, Math.PI / 180 * 65, dims[0], dims[1], 0.001, 1000);
   const scene = new Scene(webgl, camera);
 
-  loader.meshes[0].translation = [-10, 0, -10];
-
+  loader.meshes[0].translation = [-4, 0, -4];
+  console.log(loader.meshes)
   
   scene.darkMode = true;
   loader.meshes.forEach(m => scene.add(m));
+
+  const l = scene.addLight('point');
+  l.position = [0, 10, 0];
+  const s = scene.addLight('spot');
+  s.direction = [4, 0, 4];
+  s.position = [-8, 10, -8];
   
   function draw() {
     scene.render();

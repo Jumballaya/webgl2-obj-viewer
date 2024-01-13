@@ -80,7 +80,7 @@ export class LightManager {
         const light = new PointLight(this, this.webgl);
         light.id = this.pointer.pointLight;
         this.pointer.pointLight++;
-        this.updatePointLight(light);
+        this.updateLight(light);
         return light;
     }
     
@@ -101,7 +101,7 @@ export class LightManager {
         const light = new SpotLight(this, this.webgl);
         light.id = this.pointer.spotLight;
         this.pointer.spotLight++;
-        this.updateSpotLight(light);
+        this.updateLight(light);
         return light;
     }
     

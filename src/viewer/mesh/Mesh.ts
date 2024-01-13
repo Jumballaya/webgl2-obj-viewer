@@ -7,6 +7,7 @@ import { Material } from "../material/Material";
 import { PhongMaterial } from "../material/PhongMaterial";
 import { DrawMode } from "../../gl/types/configs";
 import { Transform } from "../../math/Transform";
+import { LitMaterial } from "../material/LitMaterial";
 
 export class Mesh {
   private transform: Transform = new Transform();
@@ -30,9 +31,10 @@ export class Mesh {
     }
     this.vertexArray.bind();
 
-    if (this.material instanceof PhongMaterial) {
-      this.material.bindUbo(materialUBO);
+    if (this.needsToBindMaterialUbo()) {
+      (this.material as any).bindUbo(materialUBO);
     }
+
     this.material.bind();
     modelUbo.bind();
     modelUbo.set('matrix', this.transform.matrix);
@@ -84,6 +86,14 @@ export class Mesh {
     for (const child of this.children) {
       child.scale = s;
     }
+  }
+
+  private needsToBindMaterialUbo(): boolean {
+    const classes = [
+      PhongMaterial,
+      LitMaterial,
+    ];
+    return classes.some(c => this.material instanceof c);
   }
 
 }
