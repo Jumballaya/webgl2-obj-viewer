@@ -20,9 +20,9 @@ export class Transform {
     }
 
     public set translation(t: vec3) {
-        this.translation[0] = t[0];
-        this.translation[1] = t[1];
-        this.translation[2] = t[2];
+        this._translation[0] = t[0];
+        this._translation[1] = t[1];
+        this._translation[2] = t[2];
         this.updateMatrix();
     }
 
@@ -31,9 +31,9 @@ export class Transform {
     }
 
     public set rotation(t: vec3) {
-        this.rotation[0] = t[0];
-        this.rotation[1] = t[1];
-        this.rotation[2] = t[2];
+        this._rotation[0] = t[0];
+        this._rotation[1] = t[1];
+        this._rotation[2] = t[2];
         this.updateMatrix();
     }
 
@@ -42,9 +42,9 @@ export class Transform {
     }
 
     public set scale(t: vec3) {
-        this.scale[0] = t[0];
-        this.scale[1] = t[1];
-        this.scale[2] = t[2];
+        this._scale[0] = t[0];
+        this._scale[1] = t[1];
+        this._scale[2] = t[2];
         this.updateMatrix();
     }
 
@@ -60,12 +60,11 @@ export class Transform {
     }
 
     private updateMatrix() {
-        const mat = mat4.create();
-        mat4.translate(mat, mat, this._translation);
-        mat4.rotateZ(mat, mat, this._rotation[2]);
-        mat4.rotateY(mat, mat, this._rotation[1]);
-        mat4.rotateX(mat, mat, this._rotation[0]);
-        mat4.scale(mat, mat, this._scale);
-        this._matrix = mat;
+        mat4.identity(this._matrix);
+        mat4.translate(this._matrix, this._matrix, this._translation);
+        mat4.rotateX(this._matrix, this._matrix, this._rotation[0]);
+        mat4.rotateY(this._matrix, this._matrix, this._rotation[1]);
+        mat4.rotateZ(this._matrix, this._matrix, this._rotation[2]);
+        mat4.scale(this._matrix, this._matrix, this._scale);
     }
 }

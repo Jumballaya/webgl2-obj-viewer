@@ -14,8 +14,11 @@ export class PhongMaterial extends Material {
   public specular: vec3;
   public diffuse: vec3;
 
+  private config: PhongMaterialConfig;
+
   constructor(webgl: WebGL, shader: string, config: PhongMaterialConfig) {
     super(webgl, shader);
+    this.config = config;
     this.albedo = config.albedo_texture || '';
     this.normal_map = config.normal_texture || '';
     this.specular_map = config.specular_texture || '';
@@ -24,6 +27,12 @@ export class PhongMaterial extends Material {
     this.diffuse = config.diffuse || [1, 1, 1];
     this.opacity = config.opacity ?? 1;
   }
+
+  
+  public clone() {
+    return new PhongMaterial(this.webgl, this.shader, this.config);
+  }
+
 
   public bindUbo(ubo: UBO) {
     ubo.bind();

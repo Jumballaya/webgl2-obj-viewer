@@ -8,7 +8,6 @@ import { GridMesh } from './mesh/GridMesh';
 import { LightManager } from './light/LightManager';
 import { Light } from './light/Light';
 import { LightTypes } from './light/types/light-types.type';
-import { LitMaterial } from './material/LitMaterial';
 
 
 export class Scene {
@@ -84,7 +83,7 @@ export class Scene {
     this._darkMode = m;
     this.gridFloor.uniform('u_dark_mode', { type: 'boolean', value: this._darkMode });
     if (this._darkMode) {
-      this.backgroundColor = [0.11, 0.11, 0.11];
+      this.backgroundColor = [0.05, 0.05, 0.05];
     } else {
       this.backgroundColor = [0.92, 0.92, 0.92];
     }

@@ -15,6 +15,10 @@ export class Material {
     this.shader = shader;
   }
 
+  public clone() {
+    return new Material(this.webgl, this.shader);
+  }
+
   public bind() {
     this.webgl.shaders[this.shader]?.bind();
     for (let tex of this.textures) {

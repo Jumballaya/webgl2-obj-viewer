@@ -10,6 +10,8 @@ export class UBO {
   private layout: Record<string, UBOLayout> = {};
   private bindingPoint = bindingPoint++;
 
+  private data: Float32Array;
+
   public name: string;
 
   constructor(ctx: WebGL2RenderingContext, name: string, config: UBOConfig | Float32Array) {
@@ -23,6 +25,7 @@ export class UBO {
     if (config instanceof Float32Array) {
       this.ctx.bufferData(ctx.UNIFORM_BUFFER, config, ctx.DYNAMIC_DRAW);
       this.unbind();
+      this.data = config;
       return;
     }
 
@@ -31,7 +34,8 @@ export class UBO {
       this.layout[entry.name] = { type: entry.type, offset: size };
       size += entry.type === 'mat4' ? 16 : 4;
     }
-    this.ctx.bufferData(ctx.UNIFORM_BUFFER, new Float32Array(size * 4), ctx.DYNAMIC_DRAW);
+    this.data = new Float32Array(size);
+    this.ctx.bufferData(ctx.UNIFORM_BUFFER, this.data, ctx.DYNAMIC_DRAW);
 
     this.unbind();
   }
@@ -45,11 +49,13 @@ export class UBO {
     if (!info) return;
     
     const offset = info.offset;
-    this.ctx.bufferSubData(this.ctx.UNIFORM_BUFFER, offset * 4, new Float32Array(value));
+    this.data.set(value, offset);
+    this.ctx.bufferSubData(this.ctx.UNIFORM_BUFFER, 0, this.data);
   }
 
   public update(data: Float32Array, offset = 0) {
-    this.ctx.bufferSubData(this.ctx.UNIFORM_BUFFER, offset, data);
+    this.data.set(data, offset / 4);
+    this.ctx.bufferSubData(this.ctx.UNIFORM_BUFFER, offset, this.data);
   }
 
   public bind() {

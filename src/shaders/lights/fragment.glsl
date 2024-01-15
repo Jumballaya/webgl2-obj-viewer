@@ -72,7 +72,7 @@ void main() {
 
   brightness *= 3.0;
 
-  vec3 ambient_color = ambient * 0.2;
+  vec3 ambient_color = ambient * 0.05;
   vec3 diffuse_color = albedo * brightness;
   vec3 color = ambient_color + diffuse_color;
 

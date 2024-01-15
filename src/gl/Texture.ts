@@ -28,6 +28,9 @@ export class Texture {
             const type = cfg.type || ctx.UNSIGNED_BYTE;
             ctx.texImage2D(ctx.TEXTURE_2D, 0, internalFormat, image[0], image[1], 0, format, type, null);
         }
+        this.ctx.pixelStorei(this.ctx.UNPACK_FLIP_Y_WEBGL, 1);
+        this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_MIN_FILTER, this.ctx.NEAREST);
+        this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_MAG_FILTER, this.ctx.NEAREST);
         this.unbind();
     }
 
@@ -42,9 +45,6 @@ export class Texture {
     public bind() {
         this.ctx.activeTexture(this.ctx.TEXTURE0 + this.slot);
         this.ctx.bindTexture(this.ctx.TEXTURE_2D, this.texture);
-        this.ctx.pixelStorei(this.ctx.UNPACK_FLIP_Y_WEBGL, 1);
-        this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_MIN_FILTER, this.ctx.NEAREST);
-        this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_MAG_FILTER, this.ctx.NEAREST);
     }
 
     public unbind() {

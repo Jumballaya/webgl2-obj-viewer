@@ -29,11 +29,19 @@ const buffers = [
 ];
 
 export class QuadMesh extends Mesh {
+  protected webgl: WebGL;
 
   constructor(webgl: WebGL, material: Material) {
     super(webgl.createVertexArray({
       drawType: WebGL2RenderingContext.STATIC_DRAW,
       buffers,
     }), material);
+    this.webgl = webgl;
+  }
+  
+  public clone(): QuadMesh {
+    const m = new QuadMesh(this.webgl, this.material.clone());
+    m.children = this.children.map(c => c.clone());
+    return m;
   }
 }

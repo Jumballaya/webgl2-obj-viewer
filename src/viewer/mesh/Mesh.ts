@@ -9,8 +9,14 @@ import { DrawMode } from "../../gl/types/configs";
 import { Transform } from "../../math/Transform";
 import { LitMaterial } from "../material/LitMaterial";
 
+
+const materialUboMaterials= [
+  PhongMaterial,
+  LitMaterial,
+];
+
 export class Mesh {
-  private transform: Transform = new Transform();
+  private transform: Transform;
   private _drawMode: DrawMode = 'triangles';
   
   protected vertexArray: VertexArray;
@@ -21,6 +27,13 @@ export class Mesh {
   constructor(vao: VertexArray, material: Material) {
     this.vertexArray = vao;
     this.material = material;
+    this.transform = new Transform();
+  }
+
+  public clone(): Mesh {
+    const m = new Mesh(this.vertexArray, this.material.clone());
+    m.children = this.children.map(c => c.clone());
+    return m;
   }
 
   public draw(webgl: WebGL, modelUbo: UBO, materialUBO: UBO) {
@@ -89,11 +102,7 @@ export class Mesh {
   }
 
   private needsToBindMaterialUbo(): boolean {
-    const classes = [
-      PhongMaterial,
-      LitMaterial,
-    ];
-    return classes.some(c => this.material instanceof c);
+    return materialUboMaterials.some(c => this.material instanceof c);
   }
 
 }
