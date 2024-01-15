@@ -8,6 +8,7 @@ import { Controller } from "../controls/Controller";
 import { UBO } from "./UBO";
 import { loadImage } from "../assets/image-loader";
 import { Surface } from "./Surface";
+import { FrameBuffer } from "./FrameBuffer";
 
 type EnableOption = 'cull_face' | 'depth' | 'blend';
 type ClearOption = 'color' | 'depth';
@@ -23,7 +24,6 @@ function getDrawMode(m: DrawMode): number {
 
 export class WebGL {
   private canvas: HTMLCanvasElement;
-  private size: [number, number] = [0, 0];
   private context: WebGL2RenderingContext;
   private isFullScreen: boolean = false;
 
@@ -35,7 +35,6 @@ export class WebGL {
     this.canvas = document.getElementById('screen')! as HTMLCanvasElement;
     this.canvas.width = size[0];
     this.canvas.height = size[1];
-    this.size = [size[0], size[1]];
 
     const context = this.canvas.getContext('webgl2');
     if (!context) throw new Error('Could not get webgl2 context');
@@ -120,6 +119,10 @@ export class WebGL {
     }
   }
 
+  public readPixels(x: number, y: number, w: number, h: number, format: number, type: number, data: Uint8ClampedArray) {
+    this.context.readPixels(x, y, w, h, format, type, data);
+  }
+
   public clearColor(c: vec3) {
     this.context.clearColor(c[0], c[1], c[2], 1);
   }
@@ -168,5 +171,9 @@ export class WebGL {
 
   public createUBO(name: string, config: UBOConfig | Float32Array): UBO {
     return new UBO(this.context, name, config);
+  }
+
+  public createFrameBuffer() {
+    return new FrameBuffer(this.context);
   }
 }

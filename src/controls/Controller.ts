@@ -32,13 +32,14 @@ type ControllerPointerLockChangeEvent = {
 }
 
 type ControllerEvents = {
-    mousemove?: (e: ControllerMouseMoveEvent) => void;
-    click?: (e: ControllerMouseClickEvent) => void;
-    wheel?: (e: ControllerMouseWheelEvent) => void;
-    keydown?: (e: ControllerKeyDownEvent) => void;
-    keyup?: (e: ControllerKeyUpEvent) => void;
-    pointerlockchange?: (e: ControllerPointerLockChangeEvent) => void;
+  mousemove: (e: ControllerMouseMoveEvent) => void;
+  click: (e: ControllerMouseClickEvent) => void;
+  wheel: (e: ControllerMouseWheelEvent) => void;
+  keydown: (e: ControllerKeyDownEvent) => void;
+  keyup: (e: ControllerKeyUpEvent) => void;
+  pointerlockchange: (e: ControllerPointerLockChangeEvent) => void;
 }
+type ControllerEventName = keyof ControllerEvents;
 
 type ControllerEventHandlers = {
   mousemove: Array<(e: ControllerMouseMoveEvent) => void>;
@@ -65,11 +66,11 @@ export class Controller {
   };
 
   private keys: Record<string, boolean> = {};
+  private curMousePosition: vec2 = [0, 0];
+  private prevMousePosition: vec2 | null = null;
 
-  public addEventListener<T extends keyof ControllerEvents>(event: T, handler: ControllerEvents[T]) {
-    const list = this.handlers[event];
-    list.push(handler);
-    this.handlers[event].push(handler);
+  public addEventListener<T extends ControllerEventName>(event: T, handler: ControllerEvents[T]) {
+    this.handlers[event].push(handler as any);
   }
 
   public requestPointerLock() {
@@ -84,23 +85,24 @@ export class Controller {
 
   public registerForCanvas(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    let prevMouse: vec2 | null = null;
     canvas.addEventListener("mousemove", (evt) => {
       evt.preventDefault();
       const rect = canvas.getBoundingClientRect();
-      const curMouse: vec2 = [evt.clientX - rect.left, evt.clientY - rect.top];
-      if (!prevMouse) {
-        prevMouse = [evt.clientX - rect.left, evt.clientY - rect.top];
+      this.curMousePosition[0] = evt.clientX - rect.left;
+      this.curMousePosition[1] = evt.clientY - rect.top;
+      if (!this.prevMousePosition) {
+        this.prevMousePosition = [evt.clientX - rect.left, evt.clientY - rect.top];
       } else if (this.handlers.mousemove.length > 0) {
         for (const handler of this.handlers.mousemove) {
           handler({
-            previousPosition: prevMouse,
-            currentPosition: curMouse,
+            previousPosition: this.prevMousePosition,
+            currentPosition: this.curMousePosition,
             event: evt
           });
         }
       }
-      prevMouse = curMouse;
+      this.prevMousePosition[0] = this.curMousePosition[0];
+      this.prevMousePosition[1] = this.curMousePosition[1];
     });
   
     canvas.addEventListener("mousedown", (evt) => {
@@ -155,6 +157,17 @@ export class Controller {
 
   public keyIsPressed(key: string): boolean {
     return !!this.keys[key];
+  }
+
+  public get mouse(): vec2 {
+    return this.curMousePosition;
+  }
+
+  public get mouseDelta(): vec2 {
+    return [
+      this.curMousePosition[0] - (this.prevMousePosition?.[0] || 0),
+      this.curMousePosition[1] - (this.prevMousePosition?.[1] || 0),
+    ]
   }
   
 }

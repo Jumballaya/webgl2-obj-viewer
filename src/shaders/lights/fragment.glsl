@@ -76,5 +76,5 @@ void main() {
   vec3 diffuse_color = albedo * brightness;
   vec3 color = ambient_color + diffuse_color;
 
-  outColor = vec4(color, 1.0);
+  outColor = vec4(color, material.opacity.r);
 }

@@ -31,6 +31,7 @@ export class Mesh {
   
   protected vertexArray: VertexArray;
   protected id: vec3;
+  protected _isHovered = false;
   
   public material: Material;
   public children: Mesh[] = [];
@@ -48,10 +49,10 @@ export class Mesh {
     return m;
   }
 
-  public draw(webgl: WebGL, modelUbo: UBO, materialUBO: UBO) {
+  public draw(webgl: WebGL, modelUbo: UBO, materialUBO: UBO, overrideMaterial?: Material) {
     if (this.children.length > 0) {
       for (const child of this.children) {
-        child.draw(webgl, modelUbo, materialUBO);
+        child.draw(webgl, modelUbo, materialUBO, overrideMaterial);
       }
     }
     this.vertexArray.bind();
@@ -59,8 +60,14 @@ export class Mesh {
     if (this.needsToBindMaterialUbo()) {
       (this.material as any).bindUbo(materialUBO);
     }
+    
 
-    this.material.bind();
+    if (overrideMaterial !== undefined) {
+      overrideMaterial.bind();
+    } else {
+      this.material.bind();
+    }
+    
     modelUbo.bind();
     modelUbo.set('matrix', this.transform.matrix);
     modelUbo.set('inv_trans_matrix', this.transform.invTrans);
@@ -112,6 +119,17 @@ export class Mesh {
     for (const child of this.children) {
       child.scale = s;
     }
+  }
+
+  public get isHovered(): boolean {
+    return this._isHovered;
+  }
+
+  public set isHovered(ih: boolean) {
+    this._isHovered = ih;
+    this.children.forEach(c => {
+      c.isHovered = ih;
+    });
   }
 
   private needsToBindMaterialUbo(): boolean {

@@ -1,7 +1,7 @@
 import './style.css'
 
-import screenVert from './shaders/texture/vertex.glsl?raw';
-import screenFrag from './shaders/texture/fragment.glsl?raw';
+import screenVert from './shaders/screen/vertex.glsl?raw';
+import screenFrag from './shaders/screen/fragment.glsl?raw';
 
 import gridVert from './shaders/grid/vertex.glsl?raw';
 import gridFrag from './shaders/grid/fragment.glsl?raw';
@@ -22,14 +22,14 @@ import idVert from './shaders/id/vertex.glsl?raw';
 import idFrag from './shaders/id/fragment.glsl?raw';
 
 import { WebGL } from './gl/WebGL';
-import { vec2, vec3 } from 'gl-matrix';
+import { vec2 } from 'gl-matrix';
 import { Camera } from './viewer/Camera';
 import { Scene } from './viewer/Scene';
 import { Loader } from './viewer/Loader';
 import { QuadMesh } from './viewer/mesh/QuadMesh';
 import { LitMaterial } from './viewer/material/LitMaterial';
-import { Mesh } from './viewer/mesh/Mesh';
-
+import { ArcballCamera } from './controls/Arcball';
+import { Controller } from './controls/Controller';
 
 const upload = document.getElementById('upload-model')! as HTMLInputElement;
 upload?.addEventListener('change', e => {
@@ -56,8 +56,13 @@ async function main() {
     { type: 'obj:network', dir: 'models/', file: 'icosphere.obj', shader: 'lights' },
   ]);
   
-  const camera = new Camera(webgl, Math.PI / 180 * 65, dims[0], dims[1], 0.001, 1000);
-  const scene = new Scene(webgl, camera);
+  const input = new ArcballCamera([0, 1, -5], [0, 0, 0], [0, 1, 0], 10, dims);
+  const controller = new Controller();
+  input.registerController(controller);
+  webgl.registerController(controller);
+
+  const camera = new Camera(webgl, Math.PI / 180 * 65, dims[0], dims[1], 0.001, 1000, input);
+  const scene = new Scene(webgl, camera, controller);
   scene.darkMode = true;
 
   const quadMat = new LitMaterial(webgl, 'lights');
@@ -68,10 +73,12 @@ async function main() {
 
   scene.add(quad);
 
-  
   const m1 = loader.meshes[0].clone();
+  const m2 = m1.clone();
+  m2.translation = [-5, 0, -5];
 
   scene.add(m1);
+  scene.add(m2);
 
   const s = scene.addLight('spot');
   s.direction = [-3, 3, -3];
@@ -90,27 +97,12 @@ async function main() {
   s4.direction = [2, 2, 2];
   s4.position = [-10, 10, -10];
 
-  // MOVE TO SCENE
-  // const m: vec2 = [0, 0];
-  // const d = new Uint8ClampedArray(4);
-  // scene.camera.controller.addEventListener('mousemove', (e) => {
-  //   m[0] = e.currentPosition[0];
-  //   m[1] = webgl.context.canvas.height - e.currentPosition[1];
-  // });
-  // let i = 0;
-
   function draw() {
-    scene.render();
+    scene.update();
 
-    // color-id picker MOVE TO SCENE
-    // webgl.context.readPixels(m[0], m[1], 1, 1, webgl.context.RGBA, webgl.context.UNSIGNED_BYTE, d);
-    // const id: vec3 = [d[0] / 256, d[1] / 256, d[2] / 256];
-    // for (const mesh of scene.meshes) {
-    //   if (mesh.isId(id)) {
-    //     mesh.rotation = [0, Math.PI * i / 180, 0];
-    //     i++;
-    //   }
-    // }
+    if (m1.isHovered) {
+      console.log('m1 hovered');
+    }
 
     requestAnimationFrame(draw);
   }
