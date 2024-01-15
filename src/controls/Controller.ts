@@ -40,24 +40,36 @@ type ControllerEvents = {
     pointerlockchange?: (e: ControllerPointerLockChangeEvent) => void;
 }
 
+type ControllerEventHandlers = {
+  mousemove: Array<(e: ControllerMouseMoveEvent) => void>;
+  click: Array<(e: ControllerMouseClickEvent) => void>;
+  wheel: Array<(e: ControllerMouseWheelEvent) => void>;
+  keydown: Array<(e: ControllerKeyDownEvent) => void>;
+  keyup: Array<(e: ControllerKeyUpEvent) => void>;
+  pointerlockchange: Array<(e: ControllerPointerLockChangeEvent) => void>;
+}
+
+
 
 export class Controller {
 
   private canvas?: HTMLCanvasElement;
 
-  private handlers: ControllerEvents = {
-    mousemove: undefined,
-    click: undefined,
-    wheel: undefined,
-    keydown: undefined,
-    keyup: undefined,
-    pointerlockchange: undefined,
+  private handlers: ControllerEventHandlers = {
+    mousemove: [],
+    click: [],
+    wheel: [],
+    keydown: [],
+    keyup: [],
+    pointerlockchange: [],
   };
 
   private keys: Record<string, boolean> = {};
 
   public addEventListener<T extends keyof ControllerEvents>(event: T, handler: ControllerEvents[T]) {
-    this.handlers[event] = handler;
+    const list = this.handlers[event];
+    list.push(handler);
+    this.handlers[event].push(handler);
   }
 
   public requestPointerLock() {
@@ -79,12 +91,14 @@ export class Controller {
       const curMouse: vec2 = [evt.clientX - rect.left, evt.clientY - rect.top];
       if (!prevMouse) {
         prevMouse = [evt.clientX - rect.left, evt.clientY - rect.top];
-      } else if (this.handlers.mousemove) {
-        this.handlers.mousemove({
-          previousPosition: prevMouse,
-          currentPosition: curMouse,
-          event: evt
-        });
+      } else if (this.handlers.mousemove.length > 0) {
+        for (const handler of this.handlers.mousemove) {
+          handler({
+            previousPosition: prevMouse,
+            currentPosition: curMouse,
+            event: evt
+          });
+        }
       }
       prevMouse = curMouse;
     });
@@ -92,15 +106,19 @@ export class Controller {
     canvas.addEventListener("mousedown", (evt) => {
       const rect = canvas.getBoundingClientRect();
       const curMouse: vec2 = [evt.clientX - rect.left, evt.clientY - rect.top];
-      if (this.handlers.click) {
-          this.handlers.click({ mousePosition: curMouse, event: evt });
+      if (this.handlers.click.length > 0) {
+        for (const handler of this.handlers.click) {
+          handler({ mousePosition: curMouse, event: evt });
+        }
       }
     });
   
     canvas.addEventListener("wheel", (evt) => {
       evt.preventDefault();
-      if (this.handlers.wheel) {
-          this.handlers.wheel({ dy: -evt.deltaY, event: evt });
+      if (this.handlers.wheel.length > 0) {
+        for (const handler of this.handlers.wheel) {
+          handler({ dy: -evt.deltaY, event: evt });
+        }
       }
     });
   
@@ -110,21 +128,27 @@ export class Controller {
 
     document.addEventListener('keydown', e => {
       this.keys[e.key] = true;
-      if (this.handlers.keydown) {
-          this.handlers.keydown({ key: e.key, event: e });
+      if (this.handlers.keydown.length > 0) {
+        for (const handler of this.handlers.keydown) {
+          handler({ key: e.key, event: e });
+        }
       }
     });
 
     document.addEventListener('keyup', e => {
       this.keys[e.key] = false;
-      if (this.handlers.keyup) {
-          this.handlers.keyup({ key: e.key, event: e });
+      if (this.handlers.keyup.length > 0) {
+        for (const handler of this.handlers.keyup) {
+          handler({ key: e.key, event: e });
+        }
       }
     });
   
     document.addEventListener('pointerlockchange', (e: Event) => {
-      if (this.handlers.pointerlockchange && this.canvas) {
-        this.handlers.pointerlockchange({ canvas: this.canvas, event: e});
+      if (this.handlers.pointerlockchange.length > 0 && this.canvas) {
+        for (const handler of this.handlers.pointerlockchange) {
+          handler({ canvas: this.canvas, event: e});
+        }
       }
     })
   }

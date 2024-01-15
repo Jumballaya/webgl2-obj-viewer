@@ -18,6 +18,7 @@ layout(std140) uniform Camera {
 layout(std140) uniform Model {
   mat4 matrix;
   mat4 inv_trans_matrix;
+  vec4 id; // red = id
 } model;
 
 void main() {

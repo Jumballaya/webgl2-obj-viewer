@@ -15,11 +15,22 @@ const materialUboMaterials= [
   LitMaterial,
 ];
 
+
+let count = 0;
+function next_id(): vec3 {
+  const r = (count >> 16) & 0xff;
+  const g = (count >> 8) & 0xff;
+  const b = count & 0xff;
+  count += 1;
+  return [r / 256, g / 256, b / 256];
+}
+
 export class Mesh {
   private transform: Transform;
   private _drawMode: DrawMode = 'triangles';
   
   protected vertexArray: VertexArray;
+  protected id: vec3;
   
   public material: Material;
   public children: Mesh[] = [];
@@ -28,6 +39,7 @@ export class Mesh {
     this.vertexArray = vao;
     this.material = material;
     this.transform = new Transform();
+    this.id = next_id();
   }
 
   public clone(): Mesh {
@@ -52,6 +64,7 @@ export class Mesh {
     modelUbo.bind();
     modelUbo.set('matrix', this.transform.matrix);
     modelUbo.set('inv_trans_matrix', this.transform.invTrans);
+    modelUbo.set('id', [this.id[0], this.id[1], this.id[2], 0]);
     
     if (this.material.cullFace) {
       webgl.enable('cull_face');
@@ -105,4 +118,17 @@ export class Mesh {
     return materialUboMaterials.some(c => this.material instanceof c);
   }
 
+  public isId(id: vec3): boolean {
+    const self = numbers_equal(this.id[0], id[0])
+      && numbers_equal(this.id[1], id[1])
+      && numbers_equal(this.id[2], id[2]);
+
+    return self || this.children.some(c => c.isId(id));
+  }
+
+}
+
+const epsilon = 0.00001;
+function numbers_equal(a: number, b: number): boolean {
+  return Math.abs(a - b) < epsilon;
 }

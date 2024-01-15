@@ -35,12 +35,16 @@ export class Scene {
     this.modelUBO = webgl.createUBO('Model', [
       { name: 'matrix', type: 'mat4' },
       { name: 'inv_trans_matrix', type: 'mat4' },
+      { name: 'id', type: 'vec4' },
     ]);
     this.modelUBO.bind();
     this.modelUBO.set('matrix', mat4.create());
     this.modelUBO.setupShader(webgl.shaders['lights']);
     this.modelUBO.setupShader(webgl.shaders['phong']);
     this.modelUBO.setupShader(webgl.shaders['grid']);
+    this.modelUBO.setupShader(webgl.shaders['albedo']);
+    this.modelUBO.setupShader(webgl.shaders['position']);
+    this.modelUBO.setupShader(webgl.shaders['id']);
     this.modelUBO.unbind();
     
     this.materialUBO = webgl.createUBO('Material', [
@@ -52,7 +56,8 @@ export class Scene {
     ]);
     this.materialUBO.bind();
     this.materialUBO.setupShader(webgl.shaders['lights']);
-    this.materialUBO.setupShader(webgl.shaders['phong'])
+    this.materialUBO.setupShader(webgl.shaders['phong']);
+    this.materialUBO.setupShader(webgl.shaders['albedo']);
     this.materialUBO.unbind();
 
     this.camera.setupUBO([
@@ -60,6 +65,9 @@ export class Scene {
       this.webgl.shaders['phong'],
       this.webgl.shaders['screen'],
       this.webgl.shaders['grid'],
+      this.webgl.shaders['albedo'],
+      this.webgl.shaders['position'],
+      this.webgl.shaders['id'],
     ]);
 
     this.lightManager = new LightManager(webgl);

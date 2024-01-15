@@ -24,7 +24,7 @@ export async function loadObj(base: string, file: string, webgl: WebGL, modelSha
   }
 
 
-  const defaultMaterial = new LitMaterial(webgl, modelShader, { name: 'default' });
+  const defaultMaterial = new Material(webgl, modelShader, { name: 'default' });
   
   const meshes: Mesh[] = [];
   let i = 0;
