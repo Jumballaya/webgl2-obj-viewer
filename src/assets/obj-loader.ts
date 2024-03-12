@@ -1,11 +1,18 @@
 import { Mesh } from "../viewer/mesh/Mesh";
 import { WebGL } from "../gl/WebGL";
 import { ObjFile } from "./obj/ObjFile";
-import { Material } from '../viewer/material/Material';
+import { Material } from "../viewer/material/Material";
 import { LitMaterial } from "../viewer/material/LitMaterial";
 
+const BASE = import.meta.env.BASE_URL || "/";
 
-export async function loadObj(base: string, file: string, webgl: WebGL, modelShader: string): Promise<Mesh> {
+export async function loadObj(
+  base: string,
+  file: string,
+  webgl: WebGL,
+  modelShader: string
+): Promise<Mesh> {
+  base = BASE + base;
   const objFile = await ObjFile.FromFile(file, base);
   const contents = await objFile.parse();
 
@@ -23,9 +30,10 @@ export async function loadObj(base: string, file: string, webgl: WebGL, modelSha
     }
   }
 
+  const defaultMaterial = new LitMaterial(webgl, modelShader, {
+    name: "default",
+  });
 
-  const defaultMaterial = new LitMaterial(webgl, modelShader, { name: 'default' });
-  
   const meshes: Mesh[] = [];
   let i = 0;
   for (const obj of contents.meshes) {
@@ -33,7 +41,9 @@ export async function loadObj(base: string, file: string, webgl: WebGL, modelSha
       drawType: WebGL2RenderingContext.STATIC_DRAW,
       buffers: obj.buffers,
     });
-    meshes.push(new Mesh(vertexArray, obj.material ? mats[obj.material] : defaultMaterial));
+    meshes.push(
+      new Mesh(vertexArray, obj.material ? mats[obj.material] : defaultMaterial)
+    );
     i++;
   }
 
