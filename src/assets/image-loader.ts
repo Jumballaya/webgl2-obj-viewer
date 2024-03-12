@@ -5,6 +5,9 @@ export function loadImage(path: string): Promise<HTMLImageElement> {
     const img = new Image();
     img.addEventListener("load", () => res(img));
     img.addEventListener("error", (e) => rej(e));
-    img.src = BASE + path;
+    let fullpath = BASE + path;
+    if (fullpath[0] === "/" && fullpath[1] === "/")
+      fullpath = fullpath.slice(1);
+    img.src = fullpath;
   });
 }

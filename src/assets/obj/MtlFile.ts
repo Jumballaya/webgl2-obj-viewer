@@ -111,7 +111,7 @@ export class MtlFile {
     }
   }
 
-  public getMaterials(): unknown[] {
+  public getMaterials() {
     return Object.keys(this.materials).map((k) => {
       return { name: k, config: this.materials[k] };
     });
