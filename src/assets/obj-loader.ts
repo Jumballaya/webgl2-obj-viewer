@@ -4,7 +4,7 @@ import { ObjFile } from "./obj/ObjFile";
 import { Material } from "../viewer/material/Material";
 import { LitMaterial } from "../viewer/material/LitMaterial";
 
-const BASE = import.meta.env.BASE_URL || "/";
+//const BASE = import.meta.env.BASE_URL || "/";
 
 export async function loadObj(
   base: string,
@@ -12,7 +12,6 @@ export async function loadObj(
   webgl: WebGL,
   modelShader: string,
 ): Promise<Mesh> {
-  base = BASE + base;
   const objFile = await ObjFile.FromFile(file, base);
   const contents = await objFile.parse();
 
