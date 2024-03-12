@@ -75,7 +75,7 @@ export class Scene {
     this.idMaterial = new Material(webgl, "id");
   }
 
-  public addEventListener(event: "hover", handler: (mesh: Mesh) => void) {
+  public addEventListener(_: "hover", handler: (mesh: Mesh) => void) {
     this.onMeshHover = handler;
   }
 

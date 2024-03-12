@@ -1,4 +1,4 @@
-import { mat4, quat, vec2, vec3 } from "gl-matrix";
+import { mat4, quat, vec3 } from "gl-matrix";
 import { Controller } from "./Controller";
 
 export class FPSController {
@@ -6,21 +6,14 @@ export class FPSController {
   private eye: vec3;
   private viewDirection: vec3;
   private upVector: vec3;
-  private screenSize: vec2;
   public speed = 0.6;
 
   private controller?: Controller;
 
-  constructor(
-    eye: vec3,
-    viewDirection: vec3,
-    upVector: vec3,
-    screenSize: vec2,
-  ) {
+  constructor(eye: vec3, viewDirection: vec3, upVector: vec3) {
     this.eye = eye;
     this.viewDirection = viewDirection;
     this.upVector = upVector;
-    this.screenSize = screenSize;
   }
 
   public update() {
