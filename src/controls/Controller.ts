@@ -70,7 +70,8 @@ export class Controller {
     event: T,
     handler: ControllerEvents[T],
   ) {
-    this.handlers[event].push(handler as any);
+    const handlers = this.handlers[event] as ControllerEvents[T][];
+    handlers.push(handler as ControllerEvents[T]);
   }
 
   public requestPointerLock() {

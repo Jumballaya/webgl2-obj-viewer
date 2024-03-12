@@ -24,7 +24,7 @@ export class MtlFile {
     const lines = this.file.split("\n");
     const tokenizer = new MtlLineTokenizer();
 
-    for (let line of lines) {
+    for (const line of lines) {
       const tokens = tokenizer.tokenize(line);
       if (!tokens || tokens.length === 0) continue;
       switch (tokens[0].type) {
@@ -111,7 +111,7 @@ export class MtlFile {
     }
   }
 
-  public getMaterials(): any[] {
+  public getMaterials(): unknown[] {
     return Object.keys(this.materials).map((k) => {
       return { name: k, config: this.materials[k] };
     });

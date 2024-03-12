@@ -1,5 +1,5 @@
 import { WebGL } from "../gl/WebGL";
-import { mat4, vec2, vec3 } from "gl-matrix";
+import { mat4, vec3 } from "gl-matrix";
 import { Camera } from "./Camera";
 import { Mesh } from "./mesh/Mesh";
 import { UBO } from "../gl/UBO";

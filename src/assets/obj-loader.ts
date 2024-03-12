@@ -35,7 +35,6 @@ export async function loadObj(
   });
 
   const meshes: Mesh[] = [];
-  let i = 0;
   for (const obj of contents.meshes) {
     const vertexArray = webgl.createVertexArray({
       drawType: WebGL2RenderingContext.STATIC_DRAW,
@@ -47,7 +46,6 @@ export async function loadObj(
         obj.material ? mats[obj.material] : defaultMaterial,
       ),
     );
-    i++;
   }
 
   if (meshes.length === 1) return meshes[0];

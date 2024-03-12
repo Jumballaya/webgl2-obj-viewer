@@ -1,3 +1,4 @@
+import { UBO } from "../../gl/UBO";
 import { WebGL } from "../../gl/WebGL";
 import { Uniform } from "../../gl/types/uniforms.type";
 
@@ -20,14 +21,16 @@ export class Material {
 
   public bind() {
     this.webgl.shaders[this.shader]?.bind();
-    for (let tex of this.textures) {
+    for (const tex of this.textures) {
       this.webgl.textures[tex]?.bind();
     }
   }
 
+  public bindUbo(_: UBO) {}
+
   public unbind() {
     this.webgl.shaders[this.shader]?.unbind();
-    for (let tex of this.textures) {
+    for (const tex of this.textures) {
       this.webgl.textures[tex]?.unbind();
     }
   }

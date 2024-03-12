@@ -14,7 +14,7 @@ export class ObjTriangle {
   public positions(): Array<number> {
     const data = new Array(9).fill(0);
     let offset = 0;
-    for (let v of this.vertices) {
+    for (const v of this.vertices) {
       if (v.position) {
         data[offset * 3 + 0] = v.position.values[0];
         data[offset * 3 + 1] = v.position.values[1];
@@ -28,7 +28,7 @@ export class ObjTriangle {
   public normals(): Array<number> {
     const data = new Array(9).fill(0);
     let offset = 0;
-    for (let v of this.vertices) {
+    for (const v of this.vertices) {
       if (v.normal) {
         data[offset * 3 + 0] = v.normal.values[0];
         data[offset * 3 + 1] = v.normal.values[1];
@@ -42,7 +42,7 @@ export class ObjTriangle {
   public texCoords(): Array<number> {
     const data = new Array(6).fill(0);
     let offset = 0;
-    for (let v of this.vertices) {
+    for (const v of this.vertices) {
       if (v.texCoord) {
         data[offset * 2 + 0] = v.texCoord.values[0];
         data[offset * 2 + 1] = v.texCoord.values[1];

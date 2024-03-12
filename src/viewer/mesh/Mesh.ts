@@ -58,7 +58,7 @@ export class Mesh {
     this.vertexArray.bind();
 
     if (this.needsToBindMaterialUbo()) {
-      (this.material as any).bindUbo(materialUBO);
+      this.material.bindUbo(materialUBO);
     }
 
     if (overrideMaterial !== undefined) {

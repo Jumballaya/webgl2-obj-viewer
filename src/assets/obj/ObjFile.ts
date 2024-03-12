@@ -35,7 +35,7 @@ export class ObjFile {
     const tokenizer = new ObjLineTokenizer();
     const materialsToLoad: string[] = [];
 
-    for (let line of lines) {
+    for (const line of lines) {
       const tokens = tokenizer.tokenize(line);
       if (!tokens || tokens.length === 0) continue;
       switch (tokens[0].type) {
