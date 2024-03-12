@@ -2,7 +2,6 @@ import { mat3, mat4, quat, vec2, vec3, vec4 } from "gl-matrix";
 import { Controller } from "./Controller";
 
 export class ArcballCamera {
-
   public zoomSpeed: number;
   public invScreen: vec2;
   public centerTranslation: mat4;
@@ -11,7 +10,13 @@ export class ArcballCamera {
   public viewMatrix: mat4;
   public invCamera: mat4;
 
-  constructor(eye: vec3, center: vec3, up: vec3, zoomSpeed: number, screenDims: vec2) {
+  constructor(
+    eye: vec3,
+    center: vec3,
+    up: vec3,
+    zoomSpeed: number,
+    screenDims: vec2,
+  ) {
     const veye = vec3.set(vec3.create(), eye[0], eye[1], eye[2]);
     const vcenter = vec3.set(vec3.create(), center[0], center[1], center[2]);
     const vup = vec3.set(vec3.create(), up[0], up[1], up[2]);
@@ -39,9 +44,17 @@ export class ArcballCamera {
     const vt = vec3.set(vec3.create(), 0, 0, -1.0 * viewDist);
     this.translation = mat4.fromTranslation(mat4.create(), vt);
 
-    const rotMat = mat3.fromValues(xAxis[0], xAxis[1], xAxis[2],
-        yAxis[0], yAxis[1], yAxis[2],
-        -zAxis[0], -zAxis[1], -zAxis[2]);
+    const rotMat = mat3.fromValues(
+      xAxis[0],
+      xAxis[1],
+      xAxis[2],
+      yAxis[0],
+      yAxis[1],
+      yAxis[2],
+      -zAxis[0],
+      -zAxis[1],
+      -zAxis[2],
+    );
     mat3.transpose(rotMat, rotMat);
     this.rotation = quat.fromMat3(quat.create(), rotMat);
     quat.normalize(this.rotation, this.rotation);
@@ -51,11 +64,10 @@ export class ArcballCamera {
     this.updateCameraMatrix();
   }
 
-  public update() {
-  }
+  public update() {}
 
   public registerController(controller: Controller) {
-    controller.addEventListener('mousemove', (e) => {
+    controller.addEventListener("mousemove", (e) => {
       const p = e.previousPosition;
       const c = e.currentPosition;
       if (e.event.buttons === 1) {
@@ -64,81 +76,107 @@ export class ArcballCamera {
       if (e.event.buttons === 2) {
         this.pan([c[0] - p[0], p[1] - c[1]]);
       }
-    })
-    controller.addEventListener('wheel', (e) => this.zoom(e.dy * 0.5));
+    });
+    controller.addEventListener("wheel", (e) => this.zoom(e.dy * 0.5));
   }
 
   public rotate(prevMouse: vec2, curMouse: vec2) {
-    const mPrev = vec2.set(vec2.create(),
-        clamp(prevMouse[0] * 2.0 * this.invScreen[0] - 1.0, -1.0, 1.0),
-        clamp(1.0 - prevMouse[1] * 2.0 * this.invScreen[1], -1.0, 1.0));
-  
-    const mCur = vec2.set(vec2.create(),
-        clamp(curMouse[0] * 2.0 * this.invScreen[0] - 1.0, -1.0, 1.0),
-        clamp(1.0 - curMouse[1] * 2.0 * this.invScreen[1], -1.0, 1.0));
-  
+    const mPrev = vec2.set(
+      vec2.create(),
+      clamp(prevMouse[0] * 2.0 * this.invScreen[0] - 1.0, -1.0, 1.0),
+      clamp(1.0 - prevMouse[1] * 2.0 * this.invScreen[1], -1.0, 1.0),
+    );
+
+    const mCur = vec2.set(
+      vec2.create(),
+      clamp(curMouse[0] * 2.0 * this.invScreen[0] - 1.0, -1.0, 1.0),
+      clamp(1.0 - curMouse[1] * 2.0 * this.invScreen[1], -1.0, 1.0),
+    );
+
     const mPrevBall = screenToArcball(mPrev);
     const mCurBall = screenToArcball(mCur);
     // rotation = curBall * prevBall * rotation
     this.rotation = quat.mul(this.rotation, mPrevBall, this.rotation);
     this.rotation = quat.mul(this.rotation, mCurBall, this.rotation);
-  
+
     this.updateCameraMatrix();
   }
-  
+
   public zoom(amount: number) {
-    const vt = vec3.set(vec3.create(), 0.0, 0.0, amount * this.invScreen[1] * this.zoomSpeed);
+    const vt = vec3.set(
+      vec3.create(),
+      0.0,
+      0.0,
+      amount * this.invScreen[1] * this.zoomSpeed,
+    );
     const t = mat4.fromTranslation(mat4.create(), vt);
     this.translation = mat4.mul(this.translation, t, this.translation);
     if (this.translation[14] >= -0.2) {
-        this.translation[14] = -0.2;
+      this.translation[14] = -0.2;
     }
     this.updateCameraMatrix();
   }
-  
+
   public pan(mouseDelta: vec2) {
-    const delta = vec4.set(vec4.create(), mouseDelta[0] * this.invScreen[0] * Math.abs(this.translation[14]), mouseDelta[1] * this.invScreen[1] * Math.abs(this.translation[14]), 0, 0);
+    const delta = vec4.set(
+      vec4.create(),
+      mouseDelta[0] * this.invScreen[0] * Math.abs(this.translation[14]),
+      mouseDelta[1] * this.invScreen[1] * Math.abs(this.translation[14]),
+      0,
+      0,
+    );
     const worldDelta = vec4.transformMat4(vec4.create(), delta, this.invCamera);
-    const translation = mat4.fromTranslation(mat4.create(), [worldDelta[0], worldDelta[1], worldDelta[2]]);
-    this.centerTranslation = mat4.mul(this.centerTranslation, translation, this.centerTranslation);
+    const translation = mat4.fromTranslation(mat4.create(), [
+      worldDelta[0],
+      worldDelta[1],
+      worldDelta[2],
+    ]);
+    this.centerTranslation = mat4.mul(
+      this.centerTranslation,
+      translation,
+      this.centerTranslation,
+    );
     this.updateCameraMatrix();
   }
-  
+
   public updateCameraMatrix() {
     // camera = translation * rotation * centerTranslation
     const rotMat = mat4.fromQuat(mat4.create(), this.rotation);
     this.viewMatrix = mat4.mul(this.viewMatrix, rotMat, this.centerTranslation);
-    this.viewMatrix = mat4.mul(this.viewMatrix, this.translation, this.viewMatrix);
+    this.viewMatrix = mat4.mul(
+      this.viewMatrix,
+      this.translation,
+      this.viewMatrix,
+    );
     this.invCamera = mat4.invert(this.invCamera, this.viewMatrix);
   }
-  
+
   public eyePos(): vec3 {
     return [this.invCamera[12], this.invCamera[13], this.invCamera[14]];
   }
-  
+
   public eyeDir() {
     let dir = vec4.set(vec4.create(), 0.0, 0.0, -1.0, 0.0);
     dir = vec4.transformMat4(dir, dir, this.invCamera);
     dir = vec4.normalize(dir, dir);
     return [dir[0], dir[1], dir[2]];
   }
-  
+
   public upDir() {
     let dir = vec4.set(vec4.create(), 0.0, 1.0, 0.0, 0.0);
     dir = vec4.transformMat4(dir, dir, this.invCamera);
     dir = vec4.normalize(dir, dir);
     return [dir[0], dir[1], dir[2]];
   }
-  
 }
 
 function screenToArcball(p: vec2) {
   const dist = vec2.dot(p, p);
   if (dist <= 1.0) {
-      return quat.set(quat.create(), p[0], p[1], Math.sqrt(1.0 - dist), 0);
+    return quat.set(quat.create(), p[0], p[1], Math.sqrt(1.0 - dist), 0);
   } else {
-      const unitP = vec2.normalize(vec2.create(), p);
-      return quat.set(quat.create(), unitP[0], unitP[1], 0, 0);
+    const unitP = vec2.normalize(vec2.create(), p);
+    return quat.set(quat.create(), unitP[0], unitP[1], 0, 0);
   }
 }
 

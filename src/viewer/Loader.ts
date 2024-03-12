@@ -5,24 +5,24 @@ import { Mesh } from "./mesh/Mesh";
 type LoaderEntry = TextureNetworkEntry | ShaderSrcEntry | ObjNetworkEntry;
 
 type TextureNetworkEntry = {
-  type: 'texture:network';
+  type: "texture:network";
   name: string;
   path: string;
 };
 
 type ShaderSrcEntry = {
-  type: 'shader:src';
+  type: "shader:src";
   name: string;
   vertex: string;
   fragment: string;
-}
+};
 
 type ObjNetworkEntry = {
-  type: 'obj:network';
+  type: "obj:network";
   dir: string;
   file: string;
   shader: string;
-}
+};
 
 export class Loader {
   private webgl: WebGL;
@@ -36,16 +36,16 @@ export class Loader {
   public async load(items: LoaderEntry[]) {
     for (const item of items) {
       switch (item.type) {
-        case 'obj:network': {
-          if (!item.dir.endsWith('/')) item.dir = item.dir + '/';
+        case "obj:network": {
+          if (!item.dir.endsWith("/")) item.dir = item.dir + "/";
           await this.loadObjNetwork(item.dir, item.file, item.shader);
           break;
         }
-        case 'shader:src': {
+        case "shader:src": {
           this.loadShaderSource(item.name, item.vertex, item.fragment);
           break;
         }
-        case 'texture:network': {
+        case "texture:network": {
           this.loadTextureNetwork(item.name, item.path);
           break;
         }

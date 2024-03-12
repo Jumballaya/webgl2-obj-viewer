@@ -10,7 +10,7 @@ export async function loadObj(
   base: string,
   file: string,
   webgl: WebGL,
-  modelShader: string
+  modelShader: string,
 ): Promise<Mesh> {
   base = BASE + base;
   const objFile = await ObjFile.FromFile(file, base);
@@ -42,7 +42,10 @@ export async function loadObj(
       buffers: obj.buffers,
     });
     meshes.push(
-      new Mesh(vertexArray, obj.material ? mats[obj.material] : defaultMaterial)
+      new Mesh(
+        vertexArray,
+        obj.material ? mats[obj.material] : defaultMaterial,
+      ),
     );
     i++;
   }

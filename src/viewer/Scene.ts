@@ -1,17 +1,16 @@
-import { WebGL } from '../gl/WebGL';
-import { mat4, vec2, vec3 } from 'gl-matrix';
-import { Camera } from './Camera';
-import { Mesh } from './mesh/Mesh';
-import { UBO } from '../gl/UBO';
-import { Surface } from '../gl/Surface';
-import { GridMesh } from './mesh/GridMesh';
-import { LightManager } from './light/LightManager';
-import { Light } from './light/Light';
-import { LightTypes } from './light/types/light-types.type';
-import { FrameBuffer } from '../gl/FrameBuffer';
-import { Material } from './material/Material';
-import { Controller } from '../controls/Controller';
-
+import { WebGL } from "../gl/WebGL";
+import { mat4, vec2, vec3 } from "gl-matrix";
+import { Camera } from "./Camera";
+import { Mesh } from "./mesh/Mesh";
+import { UBO } from "../gl/UBO";
+import { Surface } from "../gl/Surface";
+import { GridMesh } from "./mesh/GridMesh";
+import { LightManager } from "./light/LightManager";
+import { Light } from "./light/Light";
+import { LightTypes } from "./light/types/light-types.type";
+import { FrameBuffer } from "../gl/FrameBuffer";
+import { Material } from "./material/Material";
+import { Controller } from "../controls/Controller";
 
 export class Scene {
   private webgl: WebGL;
@@ -37,43 +36,46 @@ export class Scene {
     this.controller = controller;
     this.camera = camera;
     this.webgl = webgl;
-    webgl.enable('depth', 'cull_face', 'blend');
+    webgl.enable("depth", "cull_face", "blend");
     webgl.blendFunc(
       WebGL2RenderingContext.SRC_ALPHA,
-      WebGL2RenderingContext.ONE_MINUS_SRC_ALPHA
+      WebGL2RenderingContext.ONE_MINUS_SRC_ALPHA,
     );
-    this.modelUBO = webgl.createUBO('Model', [
-      { name: 'matrix', type: 'mat4' },
-      { name: 'inv_trans_matrix', type: 'mat4' },
-      { name: 'id', type: 'vec4' },
+    this.modelUBO = webgl.createUBO("Model", [
+      { name: "matrix", type: "mat4" },
+      { name: "inv_trans_matrix", type: "mat4" },
+      { name: "id", type: "vec4" },
     ]);
-    this.materialUBO = webgl.createUBO('Material', [
-      { name: 'ambient', type: 'vec4' },
-      { name: 'diffuse', type: 'vec4' },
-      { name: 'specular', type: 'vec4' },
-      { name: 'opacity', type: 'vec4' },
-      { name: 'textures', type: 'vec4' },
+    this.materialUBO = webgl.createUBO("Material", [
+      { name: "ambient", type: "vec4" },
+      { name: "diffuse", type: "vec4" },
+      { name: "specular", type: "vec4" },
+      { name: "opacity", type: "vec4" },
+      { name: "textures", type: "vec4" },
     ]);
     this.lightManager = new LightManager(webgl);
     this.setupUbos({
-      model: ['lights', 'phong', 'grid', 'albedo', 'position', 'id'],
-      material: ['lights', 'phong', 'albedo'],
-      camera: ['lights', 'phong', 'screen', 'grid', 'albedo', 'position', 'id'],
-      lights: ['lights'],
+      model: ["lights", "phong", "grid", "albedo", "position", "id"],
+      material: ["lights", "phong", "albedo"],
+      camera: ["lights", "phong", "screen", "grid", "albedo", "position", "id"],
+      lights: ["lights"],
     });
 
-    this.screen = webgl.createSurface('screen', this.camera.screenSize, true);
+    this.screen = webgl.createSurface("screen", this.camera.screenSize, true);
     this.screen.disable();
-    
+
     this.backgroundColor = [0.92, 0.92, 0.92];
     this.gridFloor = new GridMesh(webgl, [30, 30]);
 
     this.hoverBuffer = webgl.createFrameBuffer();
-    this.hoverBuffer.attachment({ type: 'color', size: this.camera.screenSize });
-    this.idMaterial = new Material(webgl, 'id');
+    this.hoverBuffer.attachment({
+      type: "color",
+      size: this.camera.screenSize,
+    });
+    this.idMaterial = new Material(webgl, "id");
   }
 
-  public addEventListener(event: 'hover', handler: (mesh: Mesh) => void) {
+  public addEventListener(event: "hover", handler: (mesh: Mesh) => void) {
     this.onMeshHover = handler;
   }
 
@@ -91,7 +93,10 @@ export class Scene {
 
   public set darkMode(m: boolean) {
     this._darkMode = m;
-    this.gridFloor.uniform('u_dark_mode', { type: 'boolean', value: this._darkMode });
+    this.gridFloor.uniform("u_dark_mode", {
+      type: "boolean",
+      value: this._darkMode,
+    });
     if (this._darkMode) {
       this.backgroundColor = [0.05, 0.05, 0.05];
     } else {
@@ -102,7 +107,7 @@ export class Scene {
   public add(mesh: Mesh) {
     this.meshes.push(mesh);
     this.meshes.sort((a, b) => {
-      return (b.material.opacity  - a.material.opacity);
+      return b.material.opacity - a.material.opacity;
     });
   }
 
@@ -121,7 +126,7 @@ export class Scene {
   }
 
   public render() {
-    this.webgl.clear('color', 'depth');
+    this.webgl.clear("color", "depth");
     this.webgl.viewport(0, 0, this.camera.screenSize);
     this.camera.update();
     this.screen.enable();
@@ -135,7 +140,7 @@ export class Scene {
 
   public renderHover() {
     this.webgl.clearColor(this.backgroundColor);
-    this.webgl.clear('color', 'depth');
+    this.webgl.clear("color", "depth");
     this.camera.update();
     for (const mesh of this.meshes) {
       mesh.draw(this.webgl, this.modelUBO, this.materialUBO, this.idMaterial);
@@ -147,7 +152,8 @@ export class Scene {
     this.webgl.readPixels(
       mouse[0],
       this.screen.size[1] - mouse[1],
-      1, 1,
+      1,
+      1,
       WebGL2RenderingContext.RGBA,
       WebGL2RenderingContext.UNSIGNED_BYTE,
       this.hoverColorBuffer,
@@ -155,7 +161,7 @@ export class Scene {
     const id: vec3 = [
       this.hoverColorBuffer[0] / 256,
       this.hoverColorBuffer[1] / 256,
-      this.hoverColorBuffer[2] / 256
+      this.hoverColorBuffer[2] / 256,
     ];
     for (const mesh of this.meshes) {
       if (mesh.isId(id)) {
@@ -167,10 +173,14 @@ export class Scene {
     }
   }
 
-  private setupUbos(config: { model: string[]; material: string[]; camera: string[]; lights: string[] }) {
-
+  private setupUbos(config: {
+    model: string[];
+    material: string[];
+    camera: string[];
+    lights: string[];
+  }) {
     this.modelUBO.bind();
-    this.modelUBO.set('matrix', mat4.create());
+    this.modelUBO.set("matrix", mat4.create());
     for (const shader of config.model) {
       this.modelUBO.setupShader(this.webgl.shaders[shader]);
     }
@@ -182,7 +192,9 @@ export class Scene {
     }
     this.materialUBO.unbind();
 
-    this.camera.setupUBO(config.camera.map(s => this.webgl.shaders[s]));
-    this.lightManager.registerShaders(config.lights.map(s => this.webgl.shaders[s]));
+    this.camera.setupUBO(config.camera.map((s) => this.webgl.shaders[s]));
+    this.lightManager.registerShaders(
+      config.lights.map((s) => this.webgl.shaders[s]),
+    );
   }
 }

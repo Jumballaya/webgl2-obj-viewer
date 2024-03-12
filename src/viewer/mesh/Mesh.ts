@@ -9,12 +9,7 @@ import { DrawMode } from "../../gl/types/configs";
 import { Transform } from "../../math/Transform";
 import { LitMaterial } from "../material/LitMaterial";
 
-
-const materialUboMaterials= [
-  PhongMaterial,
-  LitMaterial,
-];
-
+const materialUboMaterials = [PhongMaterial, LitMaterial];
 
 let count = 0;
 function next_id(): vec3 {
@@ -27,12 +22,12 @@ function next_id(): vec3 {
 
 export class Mesh {
   private transform: Transform;
-  private _drawMode: DrawMode = 'triangles';
-  
+  private _drawMode: DrawMode = "triangles";
+
   protected vertexArray: VertexArray;
   protected id: vec3;
   protected _isHovered = false;
-  
+
   public material: Material;
   public children: Mesh[] = [];
 
@@ -45,11 +40,16 @@ export class Mesh {
 
   public clone(): Mesh {
     const m = new Mesh(this.vertexArray, this.material.clone());
-    m.children = this.children.map(c => c.clone());
+    m.children = this.children.map((c) => c.clone());
     return m;
   }
 
-  public draw(webgl: WebGL, modelUbo: UBO, materialUBO: UBO, overrideMaterial?: Material) {
+  public draw(
+    webgl: WebGL,
+    modelUbo: UBO,
+    materialUBO: UBO,
+    overrideMaterial?: Material,
+  ) {
     if (this.children.length > 0) {
       for (const child of this.children) {
         child.draw(webgl, modelUbo, materialUBO, overrideMaterial);
@@ -60,23 +60,22 @@ export class Mesh {
     if (this.needsToBindMaterialUbo()) {
       (this.material as any).bindUbo(materialUBO);
     }
-    
 
     if (overrideMaterial !== undefined) {
       overrideMaterial.bind();
     } else {
       this.material.bind();
     }
-    
+
     modelUbo.bind();
-    modelUbo.set('matrix', this.transform.matrix);
-    modelUbo.set('inv_trans_matrix', this.transform.invTrans);
-    modelUbo.set('id', [this.id[0], this.id[1], this.id[2], 0]);
-    
+    modelUbo.set("matrix", this.transform.matrix);
+    modelUbo.set("inv_trans_matrix", this.transform.invTrans);
+    modelUbo.set("id", [this.id[0], this.id[1], this.id[2], 0]);
+
     if (this.material.cullFace) {
-      webgl.enable('cull_face');
+      webgl.enable("cull_face");
     } else {
-      webgl.disable('cull_face');
+      webgl.disable("cull_face");
     }
 
     webgl.drawArrays(this.vertexArray.vertexCount, this._drawMode);
@@ -127,23 +126,23 @@ export class Mesh {
 
   public set isHovered(ih: boolean) {
     this._isHovered = ih;
-    this.children.forEach(c => {
+    this.children.forEach((c) => {
       c.isHovered = ih;
     });
   }
 
   private needsToBindMaterialUbo(): boolean {
-    return materialUboMaterials.some(c => this.material instanceof c);
+    return materialUboMaterials.some((c) => this.material instanceof c);
   }
 
   public isId(id: vec3): boolean {
-    const self = numbers_equal(this.id[0], id[0])
-      && numbers_equal(this.id[1], id[1])
-      && numbers_equal(this.id[2], id[2]);
+    const self =
+      numbers_equal(this.id[0], id[0]) &&
+      numbers_equal(this.id[1], id[1]) &&
+      numbers_equal(this.id[2], id[2]);
 
-    return self || this.children.some(c => c.isId(id));
+    return self || this.children.some((c) => c.isId(id));
   }
-
 }
 
 const epsilon = 0.00001;

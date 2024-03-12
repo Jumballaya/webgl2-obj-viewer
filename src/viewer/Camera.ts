@@ -1,8 +1,8 @@
-import { WebGL } from '../gl/WebGL';
-import { mat4, vec2, vec4 } from 'gl-matrix';
-import { UBO } from '../gl/UBO';
-import { CameraController } from '../controls/types/camera-controller';
-import { Shader } from '../gl/Shader';
+import { WebGL } from "../gl/WebGL";
+import { mat4, vec2, vec4 } from "gl-matrix";
+import { UBO } from "../gl/UBO";
+import { CameraController } from "../controls/types/camera-controller";
+import { Shader } from "../gl/Shader";
 
 export class Camera {
   private input: CameraController;
@@ -12,21 +12,29 @@ export class Camera {
 
   private screenDims: vec2;
 
-  constructor(webgl: WebGL, fov: number, width: number, height: number, near: number, far: number, input: CameraController) {
+  constructor(
+    webgl: WebGL,
+    fov: number,
+    width: number,
+    height: number,
+    near: number,
+    far: number,
+    input: CameraController,
+  ) {
     this.screenDims = [width, height];
     this.projMatrix = mat4.create();
     mat4.perspective(this.projMatrix, fov, width / height, near, far);
     this.input = input;
-  
-    this.cameraUBO = webgl.createUBO('Camera', [
-      { name: 'projection', type: 'mat4', },
-      { name: 'view', type: 'mat4', },
-      { name: 'position', type: 'vec4' },
+
+    this.cameraUBO = webgl.createUBO("Camera", [
+      { name: "projection", type: "mat4" },
+      { name: "view", type: "mat4" },
+      { name: "position", type: "vec4" },
     ]);
     this.cameraUBO.bind();
-    this.cameraUBO.set('projection', this.projMatrix);
-    this.cameraUBO.set('view', this.input.viewMatrix);
-    this.cameraUBO.set('position', [...this.input.eyePos(), 0.0] as vec4);
+    this.cameraUBO.set("projection", this.projMatrix);
+    this.cameraUBO.set("view", this.input.viewMatrix);
+    this.cameraUBO.set("position", [...this.input.eyePos(), 0.0] as vec4);
     this.cameraUBO.unbind();
   }
 
@@ -41,9 +49,9 @@ export class Camera {
   public update() {
     this.input.update();
     this.cameraUBO.bind();
-    this.cameraUBO.set('projection', this.projMatrix);
-    this.cameraUBO.set('view', this.input.viewMatrix);
-    this.cameraUBO.set('position', [...this.input.eyePos(), 0.0] as vec4);
+    this.cameraUBO.set("projection", this.projMatrix);
+    this.cameraUBO.set("view", this.input.viewMatrix);
+    this.cameraUBO.set("position", [...this.input.eyePos(), 0.0] as vec4);
     this.cameraUBO.unbind();
   }
 
@@ -54,6 +62,4 @@ export class Camera {
   public get screenSize(): vec2 {
     return this.screenDims;
   }
-
 }
-

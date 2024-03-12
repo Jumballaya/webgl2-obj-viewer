@@ -7,7 +7,6 @@ export class Material {
   protected textures: Array<string> = [];
   public opacity: number = 1;
 
-
   public cullFace = true;
 
   constructor(webgl: WebGL, shader: string) {
@@ -40,5 +39,4 @@ export class Material {
   public texture(name: string) {
     this.textures.push(name);
   }
-
 }

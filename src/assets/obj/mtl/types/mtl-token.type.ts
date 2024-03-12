@@ -1,4 +1,3 @@
-
 export type MtlToken =
   | MtlNumberToken
   | MtlStringToken
@@ -13,56 +12,56 @@ export type MtlToken =
   | MtlEmissiveToken;
 
 export type MtlNewMtlToken = {
-  type: 'new-material';
-  value: 'newmtl';
-}
+  type: "new-material";
+  value: "newmtl";
+};
 
 export type MtlSpecularMapToken = {
-  type: 'specular-map';
-  value: 'map_Ns';
-}
+  type: "specular-map";
+  value: "map_Ns";
+};
 
 export type MtlAlbedoMapToken = {
-  type: 'albedo-map';
-  value: 'map_Kd';
-}
+  type: "albedo-map";
+  value: "map_Kd";
+};
 
 export type MtlNormalMapToken = {
-  type: 'normal-map';
-  value: 'map_Bump';
-}
+  type: "normal-map";
+  value: "map_Bump";
+};
 
 export type MtlAmbientToken = {
-  type: 'ambient';
-  value: 'Ka';
-}
+  type: "ambient";
+  value: "Ka";
+};
 
 export type MtlSpecularToken = {
-  type: 'specular';
-  value: 'Ks';
-}
+  type: "specular";
+  value: "Ks";
+};
 
 export type MtlEmissiveToken = {
-  type: 'emissive';
-  value: 'Ke';
-}
+  type: "emissive";
+  value: "Ke";
+};
 
 export type MtlDiffuseToken = {
-  type: 'diffuse';
-  value: 'Kd';
-}
+  type: "diffuse";
+  value: "Kd";
+};
 
 export type MtlNumberToken = {
-  type: 'number';
+  type: "number";
   value: number;
 };
 
 export type MtlStringToken = {
-  type: 'string';
+  type: "string";
   value: string;
 };
 
 export type MtlDissolveToken = {
-  type: 'dissolve';
-  value: 'd';
+  type: "dissolve";
+  value: "d";
 };

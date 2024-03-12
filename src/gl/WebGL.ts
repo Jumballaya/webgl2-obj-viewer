@@ -3,22 +3,31 @@ import { Shader } from "./Shader";
 import { Texture } from "./Texture";
 import { VertexArray } from "./VertexArray";
 import { VertexBuffer } from "./VertexBuffer";
-import { DrawMode, TextureConfig, UBOConfig, VertexArrayConfig, VertexBufferConfig } from "./types/configs";
+import {
+  DrawMode,
+  TextureConfig,
+  UBOConfig,
+  VertexArrayConfig,
+  VertexBufferConfig,
+} from "./types/configs";
 import { Controller } from "../controls/Controller";
 import { UBO } from "./UBO";
 import { loadImage } from "../assets/image-loader";
 import { Surface } from "./Surface";
 import { FrameBuffer } from "./FrameBuffer";
 
-type EnableOption = 'cull_face' | 'depth' | 'blend';
-type ClearOption = 'color' | 'depth';
+type EnableOption = "cull_face" | "depth" | "blend";
+type ClearOption = "color" | "depth";
 
 function getDrawMode(m: DrawMode): number {
   const gl = WebGL2RenderingContext;
-  switch(m) {
-    case 'lines': return gl.LINES;
-    case 'points': return gl.POINTS;
-    case 'triangles': return gl.TRIANGLES;
+  switch (m) {
+    case "lines":
+      return gl.LINES;
+    case "points":
+      return gl.POINTS;
+    case "triangles":
+      return gl.TRIANGLES;
   }
 }
 
@@ -30,17 +39,16 @@ export class WebGL {
   public shaders: Record<string, Shader> = {};
   public textures: Record<string, Texture> = {};
 
-
   constructor(size: [number, number]) {
-    this.canvas = document.getElementById('screen')! as HTMLCanvasElement;
+    this.canvas = document.getElementById("screen")! as HTMLCanvasElement;
     this.canvas.width = size[0];
     this.canvas.height = size[1];
 
-    const context = this.canvas.getContext('webgl2');
-    if (!context) throw new Error('Could not get webgl2 context');
+    const context = this.canvas.getContext("webgl2");
+    if (!context) throw new Error("Could not get webgl2 context");
     this.context = context;
 
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       if (this.fullScreen) {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
@@ -66,11 +74,11 @@ export class WebGL {
     let mask = 0;
     for (const opt of opts) {
       switch (opt) {
-        case 'color': {
+        case "color": {
           mask |= this.context.COLOR_BUFFER_BIT;
           break;
         }
-        case 'depth': {
+        case "depth": {
           mask |= this.context.DEPTH_BUFFER_BIT;
           break;
         }
@@ -84,15 +92,15 @@ export class WebGL {
   public enable(...opts: EnableOption[]) {
     for (const opt of opts) {
       switch (opt) {
-        case 'cull_face': {
+        case "cull_face": {
           this.context.enable(this.context.CULL_FACE);
           break;
         }
-        case 'depth': {
+        case "depth": {
           this.context.enable(this.context.DEPTH_TEST);
           break;
         }
-        case 'blend': {
+        case "blend": {
           this.context.enable(this.context.BLEND);
           break;
         }
@@ -103,15 +111,15 @@ export class WebGL {
   public disable(...opts: EnableOption[]) {
     for (const opt of opts) {
       switch (opt) {
-        case 'cull_face': {
+        case "cull_face": {
           this.context.disable(this.context.CULL_FACE);
           break;
         }
-        case 'depth': {
+        case "depth": {
           this.context.disable(this.context.DEPTH_TEST);
           break;
         }
-        case 'blend': {
+        case "blend": {
           this.context.disable(this.context.BLEND);
           break;
         }
@@ -119,7 +127,15 @@ export class WebGL {
     }
   }
 
-  public readPixels(x: number, y: number, w: number, h: number, format: number, type: number, data: Uint8ClampedArray) {
+  public readPixels(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    format: number,
+    type: number,
+    data: Uint8ClampedArray,
+  ) {
     this.context.readPixels(x, y, w, h, format, type, data);
   }
 
@@ -137,7 +153,7 @@ export class WebGL {
 
   public drawArrays(count: number, drawMode: DrawMode) {
     const mode = getDrawMode(drawMode);
-    this.context.drawArrays(mode, 0, count)
+    this.context.drawArrays(mode, 0, count);
   }
 
   public createShader(name: string, vertex: string, fragment: string): Shader {
@@ -154,7 +170,11 @@ export class WebGL {
     return new VertexArray(this.context, config);
   }
 
-  public createTexture(name: string, image: HTMLImageElement | vec2, cfg?: TextureConfig): Texture {
+  public createTexture(
+    name: string,
+    image: HTMLImageElement | vec2,
+    cfg?: TextureConfig,
+  ): Texture {
     const tex = new Texture(this.context, image, cfg);
     this.textures[name] = tex;
     return tex;

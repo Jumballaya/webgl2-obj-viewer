@@ -3,7 +3,10 @@ import { ObjVertex } from "./ObjVertex";
 export class ObjTriangle {
   public vertices: [ObjVertex, ObjVertex, ObjVertex];
 
-  constructor(vertices: [ObjVertex, ObjVertex, ObjVertex], smoothShaded = false) {
+  constructor(
+    vertices: [ObjVertex, ObjVertex, ObjVertex],
+    smoothShaded = false,
+  ) {
     this.vertices = vertices;
     if (smoothShaded) this.applySmoothShading();
   }
@@ -13,9 +16,9 @@ export class ObjTriangle {
     let offset = 0;
     for (let v of this.vertices) {
       if (v.position) {
-        data[(offset * 3)+0] = v.position.values[0];
-        data[(offset * 3)+1] = v.position.values[1];
-        data[(offset * 3)+2] = v.position.values[2];
+        data[offset * 3 + 0] = v.position.values[0];
+        data[offset * 3 + 1] = v.position.values[1];
+        data[offset * 3 + 2] = v.position.values[2];
       }
       offset++;
     }
@@ -27,9 +30,9 @@ export class ObjTriangle {
     let offset = 0;
     for (let v of this.vertices) {
       if (v.normal) {
-        data[(offset * 3)+0] = v.normal.values[0];
-        data[(offset * 3)+1] = v.normal.values[1];
-        data[(offset * 3)+2] = v.normal.values[2];
+        data[offset * 3 + 0] = v.normal.values[0];
+        data[offset * 3 + 1] = v.normal.values[1];
+        data[offset * 3 + 2] = v.normal.values[2];
       }
       offset++;
     }
@@ -41,8 +44,8 @@ export class ObjTriangle {
     let offset = 0;
     for (let v of this.vertices) {
       if (v.texCoord) {
-        data[(offset * 2)+0] = v.texCoord.values[0];
-        data[(offset * 2)+1] = v.texCoord.values[1];
+        data[offset * 2 + 0] = v.texCoord.values[0];
+        data[offset * 2 + 1] = v.texCoord.values[1];
       }
       offset++;
     }

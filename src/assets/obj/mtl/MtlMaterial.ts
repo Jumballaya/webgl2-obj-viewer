@@ -8,7 +8,7 @@ export class MtlMaterial {
   emissive: vec3 = [0, 0, 0]; // Ke
   opacity: number = 1; // d -> dissolve
   illum = 1; // illuminated
-  
+
   specular_texture?: string; // Ns
   albedo_texture?: string; // map_Kd
   normal_texture?: string; // map_Bump
